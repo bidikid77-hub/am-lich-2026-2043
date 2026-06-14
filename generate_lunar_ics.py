@@ -112,7 +112,8 @@ def main()->None:
         quality=day_quality(ld,day_branch,term); truc=truc_for(ld,sx.getDayGZ().dz); constellation=NHI_THAP_BAT_TU[current.toordinal()%28]
         good,bad=stars_for(quality,term,ld); should,avoid,level=recommendations(quality,truc,good,bad)
         hours=[f"{h} ({HOUR_RANGES[h]})" for h in HOANG_DAO_HOURS[day_branch]]
-        lunar_label=f"{ld.day:02d}/{ld.month:02d}/{ld.year} ÂL"
+        lunar_suffix="ÂLN" if is_leap_month(ld) else "ÂL"
+        lunar_label=f"{ld.day:02d}/{ld.month:02d}/{ld.year} {lunar_suffix}"
         title_bits=[]
         if ld.day == 1:
             title_bits.append("Mùng 1")

@@ -6,7 +6,7 @@ Lịch âm Việt Nam dạng **iCalendar / WebCal** cho giai đoạn **2026–20
 
 - Mỗi ngày dương lịch là một sự kiện nguyên ngày trong `.ics`
 - Hiển thị **ngày/tháng/năm âm lịch** theo dạng `dd/mm/yyyy ÂL`
-- Có **tháng nhuận** nếu phát sinh
+- Với **tháng nhuận**, hiển thị `dd/mm/yyyy ÂLN` để dễ phân biệt
 - Có **can chi năm** và **can chi ngày**
 - Bao phủ **24 tiết khí**: Lập xuân, Xuân phân, Hạ chí, Thu phân, Đông chí...
 - Đánh dấu **Mùng 1**, **Rằm**, và các ngày lễ âm lịch phổ biến
