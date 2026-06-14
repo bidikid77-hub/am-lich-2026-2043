@@ -23,7 +23,16 @@ WEEKDAYS = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "T
 TRUC = ["Kiến", "Trừ", "Mãn", "Bình", "Định", "Chấp", "Phá", "Nguy", "Thành", "Thu", "Khai", "Bế"]
 NHI_THAP_BAT_TU = ["Giác", "Cang", "Đê", "Phòng", "Tâm", "Vĩ", "Cơ", "Đẩu", "Ngưu", "Nữ", "Hư", "Nguy", "Thất", "Bích", "Khuê", "Lâu", "Vị", "Mão", "Tất", "Chủy", "Sâm", "Tỉnh", "Quỷ", "Liễu", "Tinh", "Trương", "Dực", "Chẩn"]
 
-FESTIVALS = {(1, 1): "Tết Nguyên Đán", (1, 15): "Rằm tháng Giêng", (3, 10): "Giỗ Tổ Hùng Vương", (5, 5): "Tết Đoan Ngọ", (7, 15): "Vu Lan", (8, 15): "Tết Trung Thu", (12, 23): "Ông Công Ông Táo"}
+FESTIVALS = {
+    (1, 1): "Tết Nguyên Đán",
+    (1, 15): "Rằm tháng Giêng",
+    (2, 15): "Lễ Phật Đản",
+    (3, 10): "Giỗ Tổ Hùng Vương",
+    (5, 5): "Tết Đoan Ngọ",
+    (7, 15): "Vu Lan",
+    (8, 15): "Tết Trung Thu",
+    (12, 23): "Ông Công Ông Táo",
+}
 SOLAR_TERMS = {0:"Đông chí",1:"Tiểu hàn",2:"Đại hàn",3:"Lập xuân",4:"Vũ thủy",5:"Kinh trập",6:"Xuân phân",7:"Thanh minh",8:"Cốc vũ",9:"Lập hạ",10:"Tiểu mãn",11:"Mang chủng",12:"Hạ chí",13:"Tiểu thử",14:"Đại thử",15:"Lập thu",16:"Xử thử",17:"Bạch lộ",18:"Thu phân",19:"Hàn lộ",20:"Sương giáng",21:"Lập đông",22:"Tiểu tuyết",23:"Đại tuyết"}
 HOANG_DAO_HOURS = {
     "Tý": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"], "Ngọ": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"],
@@ -104,7 +113,15 @@ def main()->None:
         good,bad=stars_for(quality,term,ld); should,avoid,level=recommendations(quality,truc,good,bad)
         hours=[f"{h} ({HOUR_RANGES[h]})" for h in HOANG_DAO_HOURS[day_branch]]
         lunar_label=f"{ld.day:02d}/{ld.month:02d}/{ld.year} ÂL"
-        summary=lunar_label
+        title_bits=[]
+        if ld.day == 1:
+            title_bits.append("Mùng 1")
+        if ld.day == 15:
+            title_bits.append("Rằm")
+        if festival:
+            title_bits.append(festival)
+        title_bits.append(lunar_label)
+        summary=" · ".join(title_bits)
         desc=(f"Âm lịch: {ld.day:02d}/{ld.month:02d}/{ld.year}{' nhuận' if is_leap_month(ld) else ''}\n"
               f"Can chi: năm {year_gz}, tháng {month_gz}, ngày {day_gz}\nTiết khí: {term or 'Không'}\nPhân loại: {quality} - {level}\n"
               f"Trực: {truc}\nNhị thập bát tú: {constellation}\nGiờ hoàng đạo: {', '.join(hours)}\nSao tốt: {', '.join(good) if good else 'Không nổi bật'}\nSao xấu: {', '.join(bad) if bad else 'Không nổi bật'}\n"
