@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lịch vạn niên 2026-2043</title>
+  <style>
+    :root{--bg:#fff8ec;--card:#fffdf8;--ink:#24170c;--muted:#735f46;--red:#b91c1c;--gold:#e7b84b;--line:#ead8b8}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#ffe5a3,#fff8ec 42%,#f5ead8);color:var(--ink)}
+    main{max-width:1100px;margin:0 auto;padding:34px 18px 60px}.hero{background:rgba(255,253,248,.9);border:1px solid var(--line);border-radius:30px;padding:30px;box-shadow:0 24px 70px rgba(90,50,0,.12)}
+    h1{margin:0 0 10px;font-size:clamp(36px,7vw,76px);line-height:.95;color:#8b0000;letter-spacing:-.04em}.muted,p{color:var(--muted);line-height:1.65}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:22px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin-top:16px}.btn,input,select{border-radius:14px;border:1px solid var(--line);padding:12px 14px;font:inherit;background:#fff;color:var(--ink)}.btn{background:var(--red);color:#fff;text-decoration:none;font-weight:800;text-align:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.tag{display:inline-block;background:#f4dfb4;padding:6px 10px;border-radius:999px;margin:4px;font-size:14px}.good{background:#dcfce7}.bad{background:#fee2e2}.term{background:#dbeafe}.day-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.day{cursor:pointer}.day:hover{outline:2px solid var(--gold)}code{background:#f1dfbf;padding:3px 6px;border-radius:7px}footer{margin-top:24px;color:#846b4e;font-size:14px}
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <h1>Lịch vạn niên<br>2026-2043</h1>
+    <p>Tra cứu âm lịch hiện đại: ngày âm, tiết khí, can chi, trực, nhị thập bát tú, giờ hoàng đạo, sao tốt/xấu và gợi ý việc nên/không nên.</p>
+    <div class="controls">
+      <input id="date" type="date" min="2026-01-01" max="2043-12-31">
+      <select id="month"></select>
+      <a class="btn" id="ics" href="am-lich-2026-2043.ics">Tải file .ics</a>
+      <a class="btn" style="background:#6b3f16" href="lunar_metadata.json">Dữ liệu JSON</a>
+    </div>
+  </section>
+
+  <section id="detail" class="card">Đang tải dữ liệu...</section>
+  <section class="card"><h2>Danh sách trong tháng</h2><div id="list" class="day-list"></div></section>
+  <footer>Lưu ý: phần tốt/xấu là tham khảo văn hóa truyền thống, nên dùng để tham khảo sinh hoạt; quyết định quan trọng vẫn cần cân nhắc thực tế.</footer>
+</main>
+<script>
+let data=[];const byDate=new Map();
+const qs=new URLSearchParams(location.search);const today='2026-01-01';
+function chips(arr,cls=''){return (arr||[]).map(x=>`<span class="tag ${cls}">${x}</span>`).join('')||'<span class="muted">Không có</span>'}
+function renderDay(row){if(!row)return;document.getElementById('date').value=row.solar;const d=document.getElementById('detail');d.innerHTML=`<h2>${row.solar} · Âm lịch ${row.lunar}</h2><p>${row.weekday} · ${row.festival||''} ${row.solar_term?('· '+row.solar_term):''}</p><div class="grid"><div><b>Can chi</b><p>Năm ${row.can_chi_year}<br>Tháng ${row.can_chi_month}<br>Ngày ${row.can_chi_day}</p></div><div><b>Đánh giá</b><p>${row.quality} · ${row.rating}</p></div><div><b>Trực / Sao</b><p>Trực ${row.truc}<br>Nhị thập bát tú: ${row.nhi_thap_bat_tu}</p></div></div><h3>Giờ hoàng đạo</h3>${chips(row.good_hours,'good')}<h3>Sao tốt</h3>${chips(row.good_stars,'good')}<h3>Sao xấu</h3>${chips(row.bad_stars,'bad')}<h3>Nên làm</h3>${chips(row.should_do,'good')}<h3>Nên tránh</h3>${chips(row.avoid,'bad')}`;renderMonth(row.solar.slice(0,7));}
+function renderMonth(ym){document.getElementById('month').value=ym;const list=document.getElementById('list');const rows=data.filter(r=>r.solar.startsWith(ym));list.innerHTML=rows.map(r=>`<div class="card day" data-date="${r.solar}"><b>${r.solar.slice(8,10)} · ÂL ${r.lunar.slice(0,5)}</b><p>${r.festival||r.solar_term||r.quality} · ${r.rating}</p></div>`).join('');list.querySelectorAll('.day').forEach(el=>el.onclick=()=>renderDay(byDate.get(el.dataset.date)));}
+fetch('lunar_metadata.json').then(r=>r.json()).then(j=>{data=j;data.forEach(r=>byDate.set(r.solar,r));const months=[...new Set(data.map(r=>r.solar.slice(0,7)))];document.getElementById('month').innerHTML=months.map(m=>`<option value="${m}">${m}</option>`).join('');document.getElementById('date').onchange=e=>renderDay(byDate.get(e.target.value));document.getElementById('month').onchange=e=>renderMonth(e.target.value);renderDay(byDate.get(qs.get('date')||today)||data[0]);});
+document.getElementById('ics').href=location.href.replace(/index\.html.*/,'am-lich-2026-2043.ics');
+</script>
+</body></html>
