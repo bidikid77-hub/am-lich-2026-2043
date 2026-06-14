@@ -6,7 +6,6 @@ Lịch âm Việt Nam dạng iCalendar/WebCal và trang tra cứu lịch vạn n
 
 Mỗi ngày dương lịch là một sự kiện nguyên ngày, có:
 
-- Ngày dương lịch
 - Ngày/tháng/năm âm lịch
 - Tháng nhuận nếu có
 - Can chi năm
