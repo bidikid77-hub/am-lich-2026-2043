@@ -103,14 +103,9 @@ def main()->None:
         quality=day_quality(ld,day_branch,term); truc=truc_for(ld,sx.getDayGZ().dz); constellation=NHI_THAP_BAT_TU[current.toordinal()%28]
         good,bad=stars_for(quality,term,ld); should,avoid,level=recommendations(quality,truc,good,bad)
         hours=[f"{h} ({HOUR_RANGES[h]})" for h in HOANG_DAO_HOURS[day_branch]]
-        title_bits=[]
-        if term: title_bits.append(term)
-        if festival: title_bits.append(festival)
-        if is_new: title_bits.append("Mùng 1")
-        if is_full: title_bits.append("Rằm")
-        title_bits.append(f"{current:%d/%m/%Y} - ÂL {ld.day:02d}/{ld.month:02d}/{ld.year}")
-        summary=" · ".join(title_bits)
-        desc=(f"Dương lịch: {current.isoformat()} ({WEEKDAYS[current.weekday()]})\nÂm lịch: {ld.day:02d}/{ld.month:02d}/{ld.year}{' nhuận' if is_leap_month(ld) else ''}\n"
+        lunar_label=f"{ld.day:02d}/{ld.month:02d}/{ld.year} ÂL"
+        summary=lunar_label
+        desc=(f"Âm lịch: {ld.day:02d}/{ld.month:02d}/{ld.year}{' nhuận' if is_leap_month(ld) else ''}\n"
               f"Can chi: năm {year_gz}, tháng {month_gz}, ngày {day_gz}\nTiết khí: {term or 'Không'}\nPhân loại: {quality} - {level}\n"
               f"Trực: {truc}\nNhị thập bát tú: {constellation}\nGiờ hoàng đạo: {', '.join(hours)}\nSao tốt: {', '.join(good) if good else 'Không nổi bật'}\nSao xấu: {', '.join(bad) if bad else 'Không nổi bật'}\n"
               f"Nên làm: {', '.join(should)}\nNên tránh: {', '.join(avoid) if avoid else 'Không có cảnh báo lớn'}")
