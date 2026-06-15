@@ -1,6 +1,7 @@
 # Lịch vạn niên 2026–2043
 
 Lịch âm Việt Nam dạng **iCalendar / WebCal** cho giai đoạn **2026–2043**, kèm trang tra cứu hiện đại và dữ liệu JSON để tái tạo lịch.
+Sở dĩ tôi tạo ra lịch âm này giai đoạn từ 2026 đến 2043 đó là trọn 1 giai đoạn vận 9 (vận hoả) của vũ trụ.
 
 ## Tính năng
 
