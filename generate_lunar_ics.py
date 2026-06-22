@@ -38,6 +38,13 @@ FESTIVALS = {
     (12, 23): "Ông Công Ông Táo",
 }
 
+FAMILY_FESTIVALS = {
+    "Giỗ ông nội",
+    "Giỗ bà nội",
+    "Giỗ ông ngoại",
+    "Giỗ bà ngoại",
+}
+
 MEMORIAL_EVENTS = [
     (date(2026, 6, 20), "Mất", "06/5/Bính Ngọ"),
     (date(2026, 6, 23), "Mở cửa mả", "09/5/Bính Ngọ"),
@@ -116,9 +123,27 @@ def recommendations(quality:str, truc:str, good:list[str], bad:list[str])->tuple
     level = "Tốt" if score>=3 else "Trung bình" if score>=1 else "Nên thận trọng"
     return sorted(set(yes)), sorted(set(no)), level
 
-def event(uid:str, day:date, summary:str, description:str)->list[str]:
+def alarm_lines(summary: str) -> list[str]:
+    return [
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        f"DESCRIPTION:{ical_escape('Nhắc: ' + summary)}",
+        "TRIGGER:-PT19H",
+        "END:VALARM",
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        f"DESCRIPTION:{ical_escape('Hôm nay: ' + summary)}",
+        "TRIGGER;RELATED=START:PT5H",
+        "END:VALARM",
+    ]
+
+def event(uid:str, day:date, summary:str, description:str, alarms:bool=False)->list[str]:
     now=datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
-    return ["BEGIN:VEVENT", f"UID:{uid}", f"DTSTAMP:{now}", f"LAST-MODIFIED:{now}", f"DTSTART;VALUE=DATE:{day:%Y%m%d}", f"DTEND;VALUE=DATE:{(day+timedelta(days=1)):%Y%m%d}", f"SUMMARY:{ical_escape(summary)}", f"DESCRIPTION:{ical_escape(description)}", "END:VEVENT"]
+    lines = ["BEGIN:VEVENT", f"UID:{uid}", f"DTSTAMP:{now}", f"LAST-MODIFIED:{now}", f"DTSTART;VALUE=DATE:{day:%Y%m%d}", f"DTEND;VALUE=DATE:{(day+timedelta(days=1)):%Y%m%d}", f"SUMMARY:{ical_escape(summary)}", f"DESCRIPTION:{ical_escape(description)}"]
+    if alarms:
+        lines.extend(alarm_lines(summary))
+    lines.append("END:VEVENT")
+    return lines
 
 def memorial_description(label:str, lunar_date:str, solar_day:date)->str:
     return (
@@ -156,11 +181,11 @@ def main()->None:
               f"Nên làm: {', '.join(should)}\nNên tránh: {', '.join(avoid) if avoid else 'Không có cảnh báo lớn'}")
         if festival: desc += f"\nSự kiện: {festival}"
         row={"solar":current.isoformat(),"weekday":WEEKDAYS[current.weekday()],"lunar":f"{ld.day:02d}/{ld.month:02d}/{ld.year}","leap":is_leap_month(ld),"festival":festival or "","solar_term":term or "","is_new_moon":is_new,"is_full_moon":is_full,"can_chi_year":year_gz,"can_chi_month":month_gz,"can_chi_day":day_gz,"quality":quality,"rating":level,"truc":truc,"nhi_thap_bat_tu":constellation,"good_hours":hours,"good_stars":good,"bad_stars":bad,"should_do":should,"avoid":avoid,"explanation":desc}
-        rows.append(row); lines.extend(event(f"vannien-{current.isoformat()}@hermes",current,summary,desc)); current+=timedelta(days=1)
+        rows.append(row); lines.extend(event(f"vannien-{current.isoformat()}@hermes", current, summary, desc, alarms=festival in FAMILY_FESTIVALS)); current+=timedelta(days=1)
     for memorial_day, memorial_label, memorial_lunar in MEMORIAL_EVENTS:
         summary = f"{memorial_label} · {memorial_lunar} ÂL"
         description = memorial_description(memorial_label, memorial_lunar, memorial_day)
-        lines.extend(event(f"memorial-{memorial_day.isoformat()}@hermes", memorial_day, summary, description))
+        lines.extend(event(f"memorial-{memorial_day.isoformat()}@hermes", memorial_day, summary, description, alarms=True))
     lines.append("END:VCALENDAR"); OUT.write_text("\r\n".join(fold(x) for x in lines)+"\r\n",encoding="utf-8"); META.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(f"Wrote {OUT}"); print(f"Days: {len(rows)}"); print(f"Solar terms: {term_count}"); print(f"Memorial events: {len(MEMORIAL_EVENTS)}")
 
