@@ -29,6 +29,7 @@ FESTIVALS = {
     (2, 15): "Lễ Phật Đản",
     (3, 10): "Giỗ Tổ Hùng Vương",
     (5, 5): "Tết Đoan Ngọ",
+    (6, 26): "Giỗ bà ngoại",
     (7, 15): "Vu Lan",
     (8, 15): "Tết Trung Thu",
     (12, 23): "Ông Công Ông Táo",
