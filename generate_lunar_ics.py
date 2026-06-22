@@ -36,7 +36,7 @@ FESTIVALS = {
 
 MEMORIAL_EVENTS = [
     (date(2026, 6, 20), "Mất", "06/5/Bính Ngọ"),
-    (date(2026, 6, 23), "Mở cửa mả / tắt", "09/5/Bính Ngọ"),
+    (date(2026, 6, 23), "Mở cửa mả", "09/5/Bính Ngọ"),
     (date(2026, 6, 26), "Sơ thất", "12/5/Bính Ngọ"),
     (date(2026, 7, 3), "Nhị thất", "19/5/Bính Ngọ"),
     (date(2026, 7, 10), "Tam thất (cúng kinh)", "26/5/Bính Ngọ"),
