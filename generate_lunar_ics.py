@@ -51,14 +51,23 @@ MEMORIAL_EVENTS = [
     (date(2026, 6, 26), "Sơ thất", "12/5/Bính Ngọ"),
     (date(2026, 7, 3), "Nhị thất", "19/5/Bính Ngọ"),
     (date(2026, 7, 10), "Tam thất (cúng kinh)", "26/5/Bính Ngọ"),
-    (date(2026, 7, 16), "Tứ thất", "03/6/Bính Ngọ"),
-    (date(2026, 7, 23), "Ngũ thất", "10/6/Bính Ngọ"),
-    (date(2026, 7, 30), "Lục thất", "17/6/Bính Ngọ"),
-    (date(2026, 8, 6), "Chung thất / 49 ngày (cúng kinh)", "24/6/Bính Ngọ"),
+    (date(2026, 7, 17), "Tứ thất", "04/6/Bính Ngọ"),
+    (date(2026, 7, 24), "Ngũ thất", "11/6/Bính Ngọ"),
+    (date(2026, 7, 31), "Lục thất", "18/6/Bính Ngọ"),
+    (date(2026, 8, 7), "Chung thất / 49 ngày (cúng kinh)", "25/6/Bính Ngọ"),
     (date(2026, 9, 27), "Bách nhật / 100 ngày", "17/8/Bính Ngọ"),
     (date(2027, 6, 10), "Tiểu tường / Giỗ đầu", "06/5/Đinh Mùi"),
     (date(2028, 5, 29), "Đại tường / Giỗ hết", "06/5/Mậu Thân"),
 ]
+
+def festival_for(ld: LunarDate) -> str:
+    festival = FESTIVALS.get((ld.month, ld.day), "")
+    if ld.year >= 2029 and ld.month == 5 and ld.day == 5 and not is_leap_month(ld):
+        return f"{festival} · Giỗ ba" if festival else "Giỗ ba"
+    return festival
+
+def has_family_alarm(festival: str) -> bool:
+    return any(name in festival for name in FAMILY_FESTIVALS) or "Giỗ ba" in festival
 SOLAR_TERMS = {0:"Đông chí",1:"Tiểu hàn",2:"Đại hàn",3:"Lập xuân",4:"Vũ thủy",5:"Kinh trập",6:"Xuân phân",7:"Thanh minh",8:"Cốc vũ",9:"Lập hạ",10:"Tiểu mãn",11:"Mang chủng",12:"Hạ chí",13:"Tiểu thử",14:"Đại thử",15:"Lập thu",16:"Xử thử",17:"Bạch lộ",18:"Thu phân",19:"Hàn lộ",20:"Sương giáng",21:"Lập đông",22:"Tiểu tuyết",23:"Đại tuyết"}
 HOANG_DAO_HOURS = {
     "Tý": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"], "Ngọ": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"],
@@ -160,7 +169,7 @@ def main()->None:
         ld=solar_to_lunar(current); sx=sxtwl.fromSolar(current.year,current.month,current.day)
         year_gz=gz_text(sx.getYearGZ()); month_gz=gz_text(sx.getMonthGZ()); day_gz=gz_text(sx.getDayGZ()); day_branch=CHI[sx.getDayGZ().dz]
         term=solar_term_for_date(current); term_count += 1 if term else 0
-        festival=FESTIVALS.get((ld.month,ld.day)); is_new=ld.day==1; is_full=ld.day==15
+        festival=festival_for(ld); is_new=ld.day==1; is_full=ld.day==15
         quality=day_quality(ld,day_branch,term); truc=truc_for(ld,sx.getDayGZ().dz); constellation=NHI_THAP_BAT_TU[current.toordinal()%28]
         good,bad=stars_for(quality,term,ld); should,avoid,level=recommendations(quality,truc,good,bad)
         hours=[f"{h} ({HOUR_RANGES[h]})" for h in HOANG_DAO_HOURS[day_branch]]
@@ -181,7 +190,7 @@ def main()->None:
               f"Nên làm: {', '.join(should)}\nNên tránh: {', '.join(avoid) if avoid else 'Không có cảnh báo lớn'}")
         if festival: desc += f"\nSự kiện: {festival}"
         row={"solar":current.isoformat(),"weekday":WEEKDAYS[current.weekday()],"lunar":f"{ld.day:02d}/{ld.month:02d}/{ld.year}","leap":is_leap_month(ld),"festival":festival or "","solar_term":term or "","is_new_moon":is_new,"is_full_moon":is_full,"can_chi_year":year_gz,"can_chi_month":month_gz,"can_chi_day":day_gz,"quality":quality,"rating":level,"truc":truc,"nhi_thap_bat_tu":constellation,"good_hours":hours,"good_stars":good,"bad_stars":bad,"should_do":should,"avoid":avoid,"explanation":desc}
-        rows.append(row); lines.extend(event(f"vannien-{current.isoformat()}@hermes", current, summary, desc, alarms=festival in FAMILY_FESTIVALS)); current+=timedelta(days=1)
+        rows.append(row); lines.extend(event(f"vannien-{current.isoformat()}@hermes", current, summary, desc, alarms=has_family_alarm(festival))); current+=timedelta(days=1)
     for memorial_day, memorial_label, memorial_lunar in MEMORIAL_EVENTS:
         summary = f"{memorial_label} · {memorial_lunar} ÂL"
         description = memorial_description(memorial_label, memorial_lunar, memorial_day)
