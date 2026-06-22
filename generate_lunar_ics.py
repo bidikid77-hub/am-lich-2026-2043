@@ -27,11 +27,14 @@ FESTIVALS = {
     (1, 1): "Tết Nguyên Đán",
     (1, 15): "Rằm tháng Giêng",
     (2, 15): "Lễ Phật Đản",
+    (2, 21): "Giỗ ông nội",
     (3, 10): "Giỗ Tổ Hùng Vương",
     (5, 5): "Tết Đoan Ngọ",
     (6, 26): "Giỗ bà ngoại",
     (7, 15): "Vu Lan",
     (8, 15): "Tết Trung Thu",
+    (8, 17): "Giỗ bà nội",
+    (11, 23): "Giỗ ông ngoại",
     (12, 23): "Ông Công Ông Táo",
 }
 
