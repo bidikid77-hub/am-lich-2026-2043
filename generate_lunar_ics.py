@@ -33,6 +33,21 @@ FESTIVALS = {
     (8, 15): "Tết Trung Thu",
     (12, 23): "Ông Công Ông Táo",
 }
+
+MEMORIAL_EVENTS = [
+    (date(2026, 6, 20), "Mất", "06/5/Bính Ngọ"),
+    (date(2026, 6, 23), "Mở cửa mả / tắt", "09/5/Bính Ngọ"),
+    (date(2026, 6, 26), "Sơ thất", "12/5/Bính Ngọ"),
+    (date(2026, 7, 3), "Nhị thất", "19/5/Bính Ngọ"),
+    (date(2026, 7, 10), "Tam thất (cúng kinh)", "26/5/Bính Ngọ"),
+    (date(2026, 7, 16), "Tứ thất", "03/6/Bính Ngọ"),
+    (date(2026, 7, 23), "Ngũ thất", "10/6/Bính Ngọ"),
+    (date(2026, 7, 30), "Lục thất", "17/6/Bính Ngọ"),
+    (date(2026, 8, 6), "Chung thất / 49 ngày (cúng kinh)", "24/6/Bính Ngọ"),
+    (date(2026, 9, 27), "Bách nhật / 100 ngày", "17/8/Bính Ngọ"),
+    (date(2027, 6, 10), "Tiểu tường / Giỗ đầu", "06/5/Đinh Mùi"),
+    (date(2028, 5, 29), "Đại tường / Giỗ hết", "06/5/Mậu Thân"),
+]
 SOLAR_TERMS = {0:"Đông chí",1:"Tiểu hàn",2:"Đại hàn",3:"Lập xuân",4:"Vũ thủy",5:"Kinh trập",6:"Xuân phân",7:"Thanh minh",8:"Cốc vũ",9:"Lập hạ",10:"Tiểu mãn",11:"Mang chủng",12:"Hạ chí",13:"Tiểu thử",14:"Đại thử",15:"Lập thu",16:"Xử thử",17:"Bạch lộ",18:"Thu phân",19:"Hàn lộ",20:"Sương giáng",21:"Lập đông",22:"Tiểu tuyết",23:"Đại tuyết"}
 HOANG_DAO_HOURS = {
     "Tý": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"], "Ngọ": ["Tý", "Sửu", "Mão", "Ngọ", "Thân", "Dậu"],
@@ -101,6 +116,14 @@ def event(uid:str, day:date, summary:str, description:str)->list[str]:
     now=datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
     return ["BEGIN:VEVENT", f"UID:{uid}", f"DTSTAMP:{now}", f"LAST-MODIFIED:{now}", f"DTSTART;VALUE=DATE:{day:%Y%m%d}", f"DTEND;VALUE=DATE:{(day+timedelta(days=1)):%Y%m%d}", f"SUMMARY:{ical_escape(summary)}", f"DESCRIPTION:{ical_escape(description)}", "END:VEVENT"]
 
+def memorial_description(label:str, lunar_date:str, solar_day:date)->str:
+    return (
+        f"Mốc lễ: {label}\n"
+        f"Âm lịch: {lunar_date}\n"
+        f"Dương lịch: {solar_day:%d/%m/%Y}\n"
+        f"Loại: Lịch cúng tuần ba"
+    )
+
 def main()->None:
     rows=[]; lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Hermes//Van Nien 2026-2043//VI","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Lịch vạn niên 2026-2043","X-WR-TIMEZONE:Asia/Ho_Chi_Minh","X-PUBLISHED-TTL:PT24H"]
     current=date(START_YEAR,1,1); end=date(END_YEAR,12,31); term_count=0
@@ -130,7 +153,11 @@ def main()->None:
         if festival: desc += f"\nSự kiện: {festival}"
         row={"solar":current.isoformat(),"weekday":WEEKDAYS[current.weekday()],"lunar":f"{ld.day:02d}/{ld.month:02d}/{ld.year}","leap":is_leap_month(ld),"festival":festival or "","solar_term":term or "","is_new_moon":is_new,"is_full_moon":is_full,"can_chi_year":year_gz,"can_chi_month":month_gz,"can_chi_day":day_gz,"quality":quality,"rating":level,"truc":truc,"nhi_thap_bat_tu":constellation,"good_hours":hours,"good_stars":good,"bad_stars":bad,"should_do":should,"avoid":avoid,"explanation":desc}
         rows.append(row); lines.extend(event(f"vannien-{current.isoformat()}@hermes",current,summary,desc)); current+=timedelta(days=1)
+    for memorial_day, memorial_label, memorial_lunar in MEMORIAL_EVENTS:
+        summary = f"{memorial_label} · {memorial_lunar} ÂL"
+        description = memorial_description(memorial_label, memorial_lunar, memorial_day)
+        lines.extend(event(f"memorial-{memorial_day.isoformat()}@hermes", memorial_day, summary, description))
     lines.append("END:VCALENDAR"); OUT.write_text("\r\n".join(fold(x) for x in lines)+"\r\n",encoding="utf-8"); META.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print(f"Wrote {OUT}"); print(f"Days: {len(rows)}"); print(f"Solar terms: {term_count}")
+    print(f"Wrote {OUT}"); print(f"Days: {len(rows)}"); print(f"Solar terms: {term_count}"); print(f"Memorial events: {len(MEMORIAL_EVENTS)}")
 
 if __name__=="__main__": main()

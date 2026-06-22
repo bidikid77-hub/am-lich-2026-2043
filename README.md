@@ -11,6 +11,7 @@ Sở dĩ tôi tạo ra lịch âm này giai đoạn từ 2026 đến 2043 đó l
 - Có **can chi năm** và **can chi ngày**
 - Bao phủ **24 tiết khí**: Lập xuân, Xuân phân, Hạ chí, Thu phân, Đông chí...
 - Đánh dấu **Mùng 1**, **Rằm**, và các ngày lễ âm lịch phổ biến
+- Có thêm các mốc **Lịch cúng tuần ba** từ ảnh anh gửi
 - Gắn nhãn **Hoàng đạo / Hắc đạo** theo quy tắc truyền thống đơn giản
 - Có trang tra cứu để xem nhanh theo ngày, tháng, giờ hoàng đạo, sao tốt/xấu, việc nên làm / nên tránh
 
